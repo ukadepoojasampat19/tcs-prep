@@ -1,0 +1,197 @@
+# Q2 – Arrange the King's Army
+
+## Problem Statement
+
+A king wants to arrange his army in a line following strict rules.
+
+You are given:
+
+* `N` → Total number of soldiers in the arrangement
+* `R` → Soldiers are numbered from `1` to `R`
+* `end` → The last soldier in the arrangement must be this number
+
+### Rules
+
+1. The arrangement must start with soldier `1`.
+2. The arrangement must end with soldier `end`.
+3. No two adjacent soldiers can have the same number.
+4. You can use any soldier number from `1` to `R` multiple times.
+
+Find the total number of valid arrangements of length `N`.
+
+---
+
+# Example
+
+Input:
+
+```text
+3 2 2
+```
+
+Possible arrangements:
+
+```text
+1 2 2 ❌
+1 1 2 ❌
+1 2 1 ❌ (doesn't end with 2)
+```
+
+Valid:
+
+```text
+1 2 1  (if N=3 and end=1)
+```
+
+The exact count depends on N,R,end.
+
+---
+
+# Observation
+
+At each position:
+
+* You can choose any soldier from `1..R`
+* But it cannot be equal to the previous soldier.
+
+This is a Dynamic Programming problem.
+
+---
+
+# DP State
+
+Let
+
+```cpp
+dp[i][j]
+```
+
+= number of ways to fill first `i` positions such that position `i` contains soldier `j`.
+
+Transition:
+
+```cpp
+dp[i][j] += dp[i-1][k]
+```
+
+for all
+
+```cpp
+k != j
+```
+
+---
+
+# Optimized Idea
+
+Instead of checking all `k` every time:
+
+Maintain:
+
+```cpp
+total = sum(dp[i-1][*])
+```
+
+Then
+
+```cpp
+dp[i][j] = total - dp[i-1][j]
+```
+
+This reduces complexity significantly.
+
+---
+
+# Optimal C++ Solution
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+
+    int N, R, end;
+    cin >> N >> R >> end;
+
+    vector<long long> prev(R + 1, 0);
+    vector<long long> curr(R + 1, 0);
+
+    prev[1] = 1;   // arrangement must start with soldier 1
+
+    for (int pos = 2; pos <= N; pos++) {
+
+        long long total = 0;
+
+        for (int j = 1; j <= R; j++) {
+            total += prev[j];
+        }
+
+        for (int j = 1; j <= R; j++) {
+            curr[j] = total - prev[j];
+        }
+
+        prev = curr;
+
+        fill(curr.begin(), curr.end(), 0);
+    }
+
+    cout << prev[end];
+
+    return 0;
+}
+```
+
+---
+
+# Complexity
+
+### Time Complexity
+
+For each position:
+
+```text
+O(R)
+```
+
+Total:
+
+```text
+O(N × R)
+```
+
+---
+
+### Space Complexity
+
+Using rolling arrays:
+
+```text
+O(R)
+```
+
+---
+
+# Why This Is Better
+
+Naive DP:
+
+```text
+O(N × R²)
+```
+
+because for every soldier we check all previous soldiers.
+
+Optimized DP:
+
+```text
+O(N × R)
+```
+
+using:
+
+```cpp
+dp[i][j] = total - dp[i-1][j]
+```
+
+This is the solution you would want to submit in TCS NQT because it avoids Time Limit Exceeded and uses only linear space.
