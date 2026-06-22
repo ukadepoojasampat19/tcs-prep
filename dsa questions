@@ -280,3 +280,153 @@ int main(){
     
     return 0;
 }
+---------------------------------------------------------------------------------------------------------------------------------------
+The code you wrote solves a specific type of Dynamic Programming problem. Here is the best way to frame the question.
+
+---
+
+# TCS NQT Style Problem Statement
+
+**Problem: Gym Membership Cost Optimization**
+
+A gym offers the following membership plans:
+
+| Duration (Months) | Cost (₹) |
+| ----------------- | -------- |
+| 3                 | 5000     |
+| 6                 | 7000     |
+| 9                 | 12000    |
+| 12                | 15000    |
+
+A customer wants a membership for exactly **`N` months**.
+
+The customer is **allowed to purchase multiple plans**, and the same plan can be purchased any number of times.
+
+Your task is to **find the minimum total cost** required to obtain **exactly `N` months** of membership.
+
+If it is **not possible** to obtain exactly `N` months using the available plans, print:
+
+```text
+Error
+```
+
+### Input
+
+A single integer `N` representing the required number of months.
+
+### Output
+
+Print the minimum total cost to obtain exactly `N` months. If it cannot be formed, print `"Error"`.
+
+### Example 1
+
+**Input**
+
+```text
+3
+```
+
+**Output**
+
+```text
+5000
+```
+
+---
+
+### Example 2
+
+**Input**
+
+```text
+15
+```
+
+**Output**
+
+```text
+19000
+```
+
+**Explanation**
+
+Possible combinations:
+
+* 12 + 3 → 15000 + 5000 = 20000
+* 6 + 9 → 7000 + 12000 = **19000**
+* 3 + 3 + 3 + 6 → 5000 + 5000 + 5000 + 7000 = 22000
+
+The minimum cost is **₹19000**.
+
+---
+
+### Example 3
+
+**Input**
+
+```text
+5
+```
+
+**Output**
+
+```text
+Error
+```
+
+**Explanation**
+
+It is impossible to form exactly 5 months using plans of 3, 6, 9, and 12 months.
+
+---
+
+## Important Note
+
+With this problem statement, your DP solution is correct because it allows combining multiple plans and searches for the **minimum possible cost**. For example, for `N = 12`, it returns **₹14000** by choosing two 6-month plans, since `7000 + 7000 < 15000`.
+
+If instead the intended question is:
+
+> "Choose exactly one membership plan matching the requested duration."
+
+then the expected outputs would be:
+
+* `3 → 5000`
+* `6 → 7000`
+* `9 → 12000`
+* `12 → 15000`
+* Any other value → `Error`
+
+and Dynamic Programming would not be needed.
+
+---------------------------------------------------------------------------------------------------------------------------------------
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter the month to calculate the cost: ";
+    cin >> n;
+
+    vector<int> month = {3, 6, 9, 12};
+    vector<int> cost = {5000, 7000, 12000, 15000};
+
+    const int INF = 1e9;
+    vector<int> dp(n + 1, INF);
+
+    dp[0] = 0;
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (i >= month[j] && dp[i - month[j]] != INF) {
+                dp[i] = min(dp[i], dp[i - month[j]] + cost[j]);
+            }
+        }
+    }
+
+    if (dp[n] == INF)
+        cout << "Error";
+    else
+        cout << dp[n];
+
+    return 0;
+}
