@@ -148,7 +148,19 @@ int main(){
 
 === Code Execution Successful ===
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-3) fraude transaction code :
+3) You are given n transactions. Each transaction has:
+
+sender
+receiver
+amount
+timestamp
+
+A transaction is fraudulent if:
+
+sender, receiver, and amount are the same.
+The timestamp difference is <= 60 seconds.
+
+Print all fraudulent transactions.
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -206,5 +218,65 @@ int main() {
         cout << "No fraudulent transactions found.\n";
     }
 
+    return 0;
+}
+
+OPTIMIZE VERSION ::
+
+/******************************************************************************
+
+INPUT: 
+ANU JON 200.50 1000
+ANU JON 200.50 1050
+RAM SAM 300.00 2000
+ANU JON 200.50 2000
+RAM SAM 300.00 2050
+
+
+*******************************************************************************/
+#include<bits/stdc++.h>
+using namespace std;
+
+struct Transaction{
+    string sender;
+    string receiver;
+    double amount;
+    long long time_stamp;
+};
+
+int main(){
+    int n;
+    cout<<"enter the  value of n:::";
+    cin>>n;
+    
+    vector<Transaction> T(n);
+    unordered_map<string, vector<pair<long long, int>>> mp;
+    vector<bool> fruad(n, false);
+    
+    for(int i=0;i<n;i++){
+        cout<<"sender     receiver       amount        time";  
+        cin>>T[i].sender>>T[i].receiver>>T[i].amount>>T[i].time_stamp;
+        
+        string key = T[i].sender +"|" + T[i].receiver + "|" + to_string(T[i].amount);
+        
+        if(mp.count(key)){
+            for(auto& prev: mp[key]){
+                if(abs(T[i].time_stamp - prev.first) <= 60){
+                    fruad[i] = true;
+                    fruad[prev.second] = true;
+                }
+            }
+        }
+        mp[key].push_back({T[i].time_stamp, i});
+    }
+    
+    bool found = false;
+    
+    for(int i=0;i<n;i++){
+        found = true;
+        if(fruad[i] == true)
+        cout<<T[i].sender<<" "<<T[i].receiver<<" "<<T[i].amount<<" "<<T[i].time_stamp<<"\n";
+    }
+    
     return 0;
 }
